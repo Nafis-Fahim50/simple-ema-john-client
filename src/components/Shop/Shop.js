@@ -6,8 +6,23 @@ import Product from '../Product/Product';
 import './Shop.css';
 
 const Shop = () => {
-    const products = useLoaderData();
+    const [products, setProducts] = useState([]);
+    const [count, setCount] = useState(0);
     const [cart, setCart] = useState([]);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+
+    useEffect(() => {
+        const url = `http://localhost:5000/products?page=${page}&size=${size}`;
+        fetch(url)
+        .then(res => res.json())
+        .then (data =>{
+            setProducts(data.products);
+            setCount(data.count);
+        })
+    },[page,size])
+
+    const pages = Math.ceil(count/size);
 
     const clearCart = () => {
         setCart([]);
@@ -63,6 +78,24 @@ const Shop = () => {
                         <button className='btn btn-success mt-5 text-white'>Review Order</button>
                     </Link>
                 </Cart>
+            </div>
+            <div className="pagination">
+                <p className='my-2 font-semibold'>Currently selected page: {page}</p>
+                {
+                    [...Array(pages).keys()].map(number => <button
+                    key={number}
+                    onClick={()=>setPage(number)}
+                    className={page === number ? 'btn btn-error ml-5 mb-5' : 'btn btn-success ml-5 mb-5'}
+                    >
+                        {number + 1}
+                    </button>)
+                }
+                <select onChange={event => setSize(event.target.value)} className='ml-5 select select-bordered'>
+                    <option value="5">5</option>
+                    <option selected value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                </select>
             </div>
         </div>
     );
